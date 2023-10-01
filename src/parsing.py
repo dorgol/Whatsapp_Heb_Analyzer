@@ -1,10 +1,6 @@
 import csv
 import re
 
-# Your sample WhatsApp chat history, read from a file
-with open("whatsapp.txt", encoding="utf-8") as f:
-    chat_history = f.read()
-
 
 def parse_file(file):
     # Split the chat history into lines

@@ -39,7 +39,8 @@ def longest_message(df):
 
 def most_busy_day(df):
     busy_day = df.groupby('date').size().idxmax()
-    return busy_day
+    busy_day_df = df[df['date'] == busy_day]
+    return busy_day_df
 
 
 def plot_messages_per_hour(df):
