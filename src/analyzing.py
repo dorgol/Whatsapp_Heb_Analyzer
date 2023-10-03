@@ -14,6 +14,10 @@ def load_and_prepare_data(csv_file):
     return df
 
 
+def count_messages_per_user(df):
+    message_counts = df.groupby('user').size().reset_index(name='message_count')
+    return message_counts
+
 def plot_messages_over_time(df):
     user_message_counts = df.groupby(['date', 'user']).size().unstack().fillna(0)
     fig = go.Figure()
