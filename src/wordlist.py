@@ -1,0 +1,1 @@
+banned_words = ['media', 'edited', 'deleted']

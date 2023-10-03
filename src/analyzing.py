@@ -5,6 +5,7 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from src.stop_words import hebrew_stop_words
 import numpy as np
+from src.wordlist import banned_words
 
 
 def load_and_prepare_data(csv_file):
@@ -14,9 +15,22 @@ def load_and_prepare_data(csv_file):
     return df
 
 
+def remove_messages(df):
+    # Create a regex pattern to match any of the banned words
+    pattern = '|'.join(re.escape(word) for word in banned_words)
+
+    # Use str.contains to create a mask of the rows that do not contain any banned words
+    mask = ~df['text'].str.contains(pattern, case=False, na=False)
+
+    # Use the mask to filter the DataFrame
+    filtered_df = df[mask]
+
+    return filtered_df.reset_index(drop=True)
+
 def count_messages_per_user(df):
     message_counts = df.groupby('user').size().reset_index(name='message_count')
     return message_counts
+
 
 def plot_messages_over_time(df):
     user_message_counts = df.groupby(['date', 'user']).size().unstack().fillna(0)
@@ -72,7 +86,7 @@ def find_ngrams_by_user(df, n):
     ngram_list = []
 
     for user, messages in df.groupby('user'):
-        all_text = ' '.join(messages['text'])
+        all_text = ' '.join(messages['text'].astype(str))
         ngrams_counter = find_ngrams(all_text, n)
         top_ngrams = ngrams_counter.most_common(10)  # Get the top 10 n-grams
         for ngram, _ in top_ngrams:
@@ -85,8 +99,10 @@ def find_ngrams_by_user(df, n):
 
 def find_defining_words(df, n, ngram_max):  # default to unigrams and bigrams
     ngram_range = (int(ngram_max), int(ngram_max))
+
     def remove_urls(text):
-        return re.sub(r'https?://\S+|www\.\S+', '', text)
+        return re.sub(r'https?://\S+|www\.\S+', '', str(text))
+
     # Remove URLs from each message
     df['text'] = df['text'].apply(remove_urls)
 

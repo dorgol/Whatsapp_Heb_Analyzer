@@ -2,7 +2,7 @@ import streamlit as st
 from src.parsing import parse_file
 from src.analyzing import main, load_and_prepare_data, plot_messages_over_time, average_message_length_by_user, \
     longest_message, most_busy_day, plot_messages_per_hour, find_ngrams_by_user, find_defining_words, \
-    count_messages_per_user
+    count_messages_per_user, remove_messages
 
 st.title("Hebrew Whatsapp Analyzer")
 uploaded_file = st.file_uploader("Choose a file")
@@ -15,6 +15,7 @@ if uploaded_file is not None:
 
     df = load_and_prepare_data('parsed_chat.csv')
     st.write(f'Total messages count: ', (len(df)))
+    df = remove_messages(df)
     message_counter = count_messages_per_user(df)
     st.write(message_counter)
     fig = plot_messages_over_time(df)
